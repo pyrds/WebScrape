@@ -1,4 +1,3 @@
-# SCRIPT ID: S778340
 library(rvest)
 library(plyr)
 library(httr)
@@ -9,9 +8,6 @@ library(RSelenium)
 library(stringr)
 library(readxl)
 library(magrittr)
-
-
-return.status <- 0
 
 # Create a tasklist of all java instances running so that we can close new instances later
 before.tasklist <-  system2("tasklist", stdout = TRUE )
