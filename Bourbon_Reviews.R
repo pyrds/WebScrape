@@ -8,6 +8,7 @@ library(RSelenium)
 library(stringr)
 library(readxl)
 library(magrittr)
+library(ggplot2)
 
 # Create a tasklist of all java instances running so that we can close new instances later
 before.tasklist <-  system2("tasklist", stdout = TRUE )
@@ -46,7 +47,7 @@ remDr <- driver[['client']]
 Sys.sleep(5)
 # TEST
 remDr$navigate("https://thebourbonculture.com/reviews-by-rating/")
-Sys.sleep(10)
+Sys.sleep(9)
 
 # Create a tasklist of all java instances running now, after starting Selenium
 after.tasklist <-  system2("tasklist", stdout = TRUE )
@@ -84,4 +85,39 @@ for (review in webElement.topreviews){
        
      }
    }
+}
+
+#Lets clean up this dataframe
+final.df <- final.df %>%
+  as_tibble(.)%>%
+  mutate(Rating = as.numeric(substr(Rating,1,3)))
+
+#summarise our data by reviews
+summ <- final.df %>% 
+  count(Rating) %>%
+  rename(QTY = n)
+
+#Lets visualize!
+ggplot(data = summ,aes(x = Rating, y = QTY)) +
+  geom_bar(stat='identity')+
+  scale_x_continuous(breaks = round(seq(min(summ$Rating), max(summ$Rating), by = 0.5),1)) +
+
+#Close up shop
+#Close the Driver 
+remDr$close()
+remDr$quit()
+
+# Stop the Selenium server
+driver$server$stop()
+rm(driver)
+gc()
+
+# Compare Tasklists to find new instance(s) & kill off any new java processes spawned by this run
+new.java <- subset(df.java.after, !(df.java.after$pid %in% df.java.before$pid))
+for (j in 1:nrow(new.java))
+{
+  pid.to.kill <- as.integer(new.java$pid[j])
+  message(c("Killing Pid - ", pid.to.kill))
+  taskkill.cmd <- paste( "taskkill" , "/F /PID" , pid.to.kill)
+  system( taskkill.cmd )
 }
