@@ -61,7 +61,7 @@ df$pid <- as.integer(substr(after.tasklist, 30, 34))
 df$after.tasklist <- NULL
 df.java.after <- df[df$taskname == 'java.exe', ]
 
-#Just find reviews that are rated 7 out of 10
+#Find Web elements with review data
 webElement.topreviews <- remDr$findElements(using = 'xpath', "//*[starts-with(text(),'1.') or starts-with(text(),'2.') or starts-with(text(),'3.') or starts-with(text(),'4.') or starts-with(text(),'5.') or starts-with(text(),'7.') or starts-with(text(),'8.') or starts-with(text(),'9.') or contains(text(),'10 - ')]")
 Sys.sleep(2)
 cnt <- 0
